@@ -2,14 +2,21 @@ import java.util.Scanner;
 
 public class Register {
 	Scanner scan;
-	Storage st ;
+	Storage st = SqlTest.getInstance();
 	public Boolean register() {
 		scan = new Scanner(System.in);
 		User user;
 		System.out.println("enter username and password");
 		String username = scan.nextLine();
+		/*String[] newUserName = username.split(" ");
+		if(newUserName.length > 1){
+			System.out.println("No Spaces allowed\n.. deleting the white spaces..");
+			username = "";
+			for(String name : newUserName)
+				username += name;
+		}*/
 		String password = scan.nextLine();
-		System.out.println("Choose the type of your account\n1-Client\n2-User");
+		System.out.println("Choose the type of your account\n1-Client\n2-Driver");
 
 		int choice = Integer.parseInt(scan.nextLine());
 

@@ -4,7 +4,10 @@ public class User {
 	String username;
 	String password;
 	Boolean enabled;
-	
+
+	public void menu() {
+
+	}
 	public String getUsername() {
 		return username;
 	}
@@ -31,6 +34,8 @@ public class User {
 		this.enabled = enabled;
 	}
 	
-	
+	public void mainmenu() {
+		
+	}
 	
 }

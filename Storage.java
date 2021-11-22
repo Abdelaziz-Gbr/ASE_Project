@@ -15,4 +15,5 @@ public interface Storage {
 	ArrayList<Offer> checkOffer(String username);
 	void addRequest(Request request);
 	void addOffer(Offer offer);
+	boolean acceptOffer(String username,int requestId);
 }

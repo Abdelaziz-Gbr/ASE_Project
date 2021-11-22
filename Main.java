@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
 
@@ -43,24 +44,51 @@ public class Main {
 		
 		//SqlTest.selectAll();
 		
-
+		Register r = new Register();
+		//r.register();*/
+		
+		/*
 		System.out.println("This is A demo Program of the Uber Application");
 		System.out.println("Test Features That are Supported");
 		Scanner scan = new Scanner(System.in);
 		while (true){
-		System.out.println("1- Login");
-		System.out.println("2- Register ");
-		int choice = 0;
-		if(scan.hasNextLine())
-			choice = Integer.parseInt(scan.nextLine());
-		if(choice == 1) {
-			Login l = new Login();
-			l.login();
-		}else if(choice == 2){
-			Register r = new Register();
-			r.register();
-		} else{
-			scan.close();
+			System.out.println("1- Login");
+			System.out.println("2- Register ");
+			int choice = 0;
+			if(scan.hasNextLine())
+				choice = Integer.parseInt(scan.nextLine());
+			if(choice == 1) {
+				Login l = new Login();
+				l.login();
+			}else if(choice == 2){
+				r.register();
+			} else{
+				scan.close();
+			}
+		}*/
+		Scanner scanner = new Scanner(System.in);
+		while (true){
+			System.out.println("1- register.");
+			System.out.println("2- log in.");
+			System.out.println("3- Exit.");
+			int answer = Integer.parseInt(scanner.nextLine());
+			if(answer == 1){
+				Register register = new Register();
+				register.register();
+			}
+			else if (answer == 2){
+				Login login = new Login();
+				User user = login.login();
+				if(user == null){
+					System.out.println("Not found.");
+				}else {
+					user.menu();
+				}
+			}else {
+				break;
+			}
 		}
-		}
+		scanner.close();
+		System.exit(0);
+	}
 }
