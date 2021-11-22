@@ -5,6 +5,7 @@ public class Offer {
 	int requestId;
 	Status status;
 	Request req;
+	
 	public Offer(float price, Driver driver) {
 		super();
 		this.price = price;
@@ -19,6 +20,8 @@ public class Offer {
 	}
 
 
+	
+	
 	public int getRequestId() {
 		return requestId;
 	}
@@ -57,7 +60,9 @@ public class Offer {
 
 	public void acceptOffer() {
 		driver.notify();
+	public String getOfferInfo() {
+		return String.format("%-20s%-15s", String.valueOf(price), status.toString()) + driver.getDriverInfo();
+		
 	}
-
-
+	
 }

@@ -1,14 +1,14 @@
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class Driver extends User{
+	Scanner scan;
 	String licence;
 	String nationalId;
 	ArrayList<String> fav = SqlTest.getInstance().getFav(this.username);
 	ArrayList<Float> rates = new ArrayList<Float>();
 	Scanner scan;
+	float avreagerate;
 	boolean enabled;
 	
 	public Driver(String username, String password,Boolean enabled) {
@@ -94,14 +94,10 @@ public class Driver extends User{
 	}
 
 	public void makeOffer(Offer offer) {
-		/*scan = new Scanner(System.in);
+		scan = new Scanner(System.in);
 		System.out.println("Enter price for this request");
-		float price = Float.parseFloat(scan.nextLine().trim());*/
-		RequestManager.getInstance().makeOffer(offer);
-	}
-	
-	public void notifyAccepted(){
-		
+		float price = Float.parseFloat(scan.nextLine().trim());
+		RequestManager.getInstance().makeOffer(new Offer(price, this));
 	}
 	
 	float avreage;
@@ -120,13 +116,6 @@ public class Driver extends User{
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
-	
-	public void rate(float r) {
-		if(rates == null)
-			rates = new ArrayList<Float>();
-		rates.add(r);
-	}
 
 	public String getLicence() {
 		return licence;
@@ -142,5 +131,25 @@ public class Driver extends User{
 
 	public void setNationalId(String nationalId) {
 		this.nationalId = nationalId;
+	}
+
+	public ArrayList<String> getFav() {
+		return fav;
+	}
+
+	public void setFav(ArrayList<String> fav) {
+		this.fav = fav;
+	}
+
+	public ArrayList<Float> getRates() {
+		return rates;
+	}
+
+	public void setRates(ArrayList<Float> rates) {
+		this.rates = rates;
+	}
+	
+	public String getDriverInfo(){
+		return String.format("%-20s%-20s%-20s", firstname , username, avreagerate);
 	}
 }
