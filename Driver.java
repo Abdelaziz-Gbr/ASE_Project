@@ -7,6 +7,7 @@ public class Driver extends User{
 	String nationalId;
 	ArrayList<String> fav;
 	ArrayList<Float> rates; 
+	float avreagerate;
 	boolean enabled;
 	
 	public Driver(String username, String password,Boolean enabled) {
@@ -32,10 +33,7 @@ public class Driver extends User{
 		scan = new Scanner(System.in);
 		System.out.println("Enter price for this request");
 		float price = Float.parseFloat(scan.nextLine().trim());
-	}
-	
-	public void notifyAccepted(){
-		
+		RequestManager.getInstance().makeOffer(new Offer(price, this));
 	}
 	
 	float avreage;
@@ -54,12 +52,40 @@ public class Driver extends User{
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
-	
-	public void rate(float r) {
-		if(rates == null)
-			rates = new ArrayList<Float>();
-		rates.add(r);
+
+	public String getLicence() {
+		return licence;
+	}
+
+	public void setLicence(String licence) {
+		this.licence = licence;
+	}
+
+	public String getNationalId() {
+		return nationalId;
+	}
+
+	public void setNationalId(String nationalId) {
+		this.nationalId = nationalId;
+	}
+
+	public ArrayList<String> getFav() {
+		return fav;
+	}
+
+	public void setFav(ArrayList<String> fav) {
+		this.fav = fav;
+	}
+
+	public ArrayList<Float> getRates() {
+		return rates;
+	}
+
+	public void setRates(ArrayList<Float> rates) {
+		this.rates = rates;
 	}
 	
+	public String getDriverInfo(){
+		return String.format("%-20s%-20s%-20s", firstname , username, avreagerate);
+	}
 }
