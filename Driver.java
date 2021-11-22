@@ -143,24 +143,4 @@ public class Driver extends User{
 	public void setNationalId(String nationalId) {
 		this.nationalId = nationalId;
 	}
-
-	public ArrayList<String> getFav() {
-		return fav;
-	}
-
-	public void setFav(ArrayList<String> fav) {
-		this.fav = fav;
-	}
-
-	public ArrayList<Float> getRates() {
-		return rates;
-	}
-
-	public void setRates(ArrayList<Float> rates) {
-		this.rates = rates;
-	}
-	
-	public String getDriverInfo(){
-		return String.format("%-20s%-20s%-20s", firstname , username, avreagerate);
-	}
 }
