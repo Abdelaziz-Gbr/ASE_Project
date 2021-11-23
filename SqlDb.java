@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SqlDb implements Storage {
 
@@ -129,7 +131,7 @@ public class SqlDb implements Storage {
             } else {
                 String insert = "insert into Driver (username,national_id,licence,)  \r\n"
                         + "values ('" + driver.getUsername() + "','" + driver.getNationalId() + "'," + driver.getLicence() + "');";
-                conn.createStatement().executeQuery(insert);
+                conn.createStatement().executeUpdate(insert);
             }
 
         } catch (SQLException e) {
@@ -150,7 +152,7 @@ public class SqlDb implements Storage {
             } else {
                 String insert = "insert into Client (username)  \r\n"
                         + "values ('" + client.getUsername() + "');";
-                conn.createStatement().executeQuery(insert);
+                conn.createStatement().executeUpdate(insert);
             }
 
         } catch (SQLException e) {
@@ -174,7 +176,7 @@ public class SqlDb implements Storage {
 
     @Override
     public ArrayList<Offer> checkOffer(String username) {
-        String sql = "SELECT Offer.*\r\n"
+        String sql = "SELECT distinct Offer.*\r\n"
                 + "  FROM Request,Offer \r\n"
                 + "  where (Request.client = '" + username + "' and Offer.request = Request.ID) or Offer.driver == '" + username + "' ;";
         ArrayList<Offer> out = new ArrayList<Offer>();
@@ -199,7 +201,7 @@ public class SqlDb implements Storage {
         String sql = "Insert into request (client,source,destination) values('" + request.getClient().getUsername() + "','" + request.getSource() + "','" + request.getDestnation() + "')";
 
         try {
-            conn.createStatement().executeQuery(sql);
+            conn.createStatement().executeUpdate(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -208,18 +210,14 @@ public class SqlDb implements Storage {
 
     @Override
     public void addOffer(Offer offer) {
-        String sql = "Insert into offer (price,driver,destination) values('" + offer.getPrice() + "','" + offer.getDriver().getUsername() + "','" + "')";
+        String sql = "Insert into offer (price,driver,request) values('" + offer.getPrice() + "','" + offer.getDriver().getUsername() + "','" +offer.getRequestId()+ "')";
 
         try {
 
-            ResultSet rs = conn.createStatement().executeQuery(sql);
+            conn.createStatement().executeUpdate(sql);
 
             // loop through the result set  
-            while (rs.next()) {
-                System.out.println(rs.getString("username") + "\t"
-                        + rs.getString("password") + "\t"
-                        + rs.getBoolean("enabled"));
-            }
+            
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -228,10 +226,13 @@ public class SqlDb implements Storage {
 
     @Override
     public boolean acceptOffer(String username, int requestId) {
-        String sql = "update Offer set status = 'ACCEPTED' where username = '" + username + "' and requestId = " + requestId + ";";
+        String sql = "update Offer set status = 'ACCEPTED' where driver = '" + username + "' and request = " + requestId + ";";
 
         try {
-            conn.createStatement().executeQuery(sql);
+            conn.createStatement().executeUpdate(sql);
+            sql = "delete from Offer where driver= '"+username+"'and status != 'ACCEPTED'";
+            conn.createStatement().executeUpdate(sql);
+            sql = "update Request set status = 'STARTED' where request = " + requestId + ";";
             return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -257,14 +258,14 @@ public class SqlDb implements Storage {
         String sql2 = "select rate from Rates where username == '" + username + "'";
         String sql3 = "update Driver set avgrate = " + avgrate + "";
         try {
-            conn.createStatement().executeQuery(sql);
+            conn.createStatement().executeUpdate(sql);
             ResultSet rs = conn.createStatement().executeQuery(sql2);
             while (rs.next()) {
                 avgrate += rs.getInt("rate");
                 numrate++;
             }
             avgrate /= numrate;
-            conn.createStatement().executeQuery(sql3);
+            conn.createStatement().executeUpdate(sql3);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -360,7 +361,7 @@ public class SqlDb implements Storage {
     }
     @Override
     public ArrayList<Request> getRequestsTo(String src){
-		String sql = "SELECT * from Request WHERE source = '" + src + "'";
+		String sql = "SELECT * from Request WHERE source = '" + src + "'and status='PENDING'";
 		ArrayList<Request> requests = new ArrayList<Request>();
 		try {
 
@@ -375,4 +376,24 @@ public class SqlDb implements Storage {
 		}
 		return requests;
 	}
+    @Override
+    public void setRequestStatus(int requestId,Status status)
+    {
+        String sql = "update Request set status = '"+status.toString()+"'where ID="+requestId+";";
+        try {
+            conn.createStatement().executeUpdate(sql);
+        } catch (SQLException ex) {
+            Logger.getLogger(SqlDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    @Override
+    public void removeOffer(Offer offer)
+    {
+        String sql = "delete from Offer where driver = '"+offer.getDriver().getUsername()+"'and request="+offer.getRequestId()+";";
+        try {
+            conn.createStatement().executeUpdate(sql);
+        } catch (SQLException ex) {
+            Logger.getLogger(SqlDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

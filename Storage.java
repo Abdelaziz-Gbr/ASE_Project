@@ -12,7 +12,9 @@ public interface Storage {
 	ArrayList<Request> checkRides(String username);
 	ArrayList<Offer> checkOffer(String username);
 	void addRequest(Request request);
+        void setRequestStatus(int requestId,Status status);
 	void addOffer(Offer offer);
+        void removeOffer(Offer offer);
 	boolean acceptOffer(String username,int requestId);
         void rateDriver(String username, int rate);
         void setEnable(String userName, int enable);
@@ -22,5 +24,6 @@ public interface Storage {
         ArrayList<Driver> getnotVerifiedDriveres();
         ArrayList<User> getUsers();
         ArrayList<Request> getRequestsTo(String src);
+        
 }
         

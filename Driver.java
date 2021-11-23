@@ -36,7 +36,8 @@ public class Driver extends User{
 			System.out.println("1- list Favorites");
 			System.out.println("2- add Favorites");
 			System.out.println("3- list Rides");
-			System.out.println("4- log out");
+                        System.out.println("4- list Offers");
+			System.out.println("5- log out");
 			int ans = Integer.parseInt(scan.nextLine());
 
 			if(ans == 1){
@@ -58,7 +59,31 @@ public class Driver extends User{
 			else if(ans == 3) {
 				ListRides();
 			}
-			else if (ans == 4){
+                        else if (ans == 4){
+				ArrayList <Offer>offers=SqlDb.getInstance().checkOffer(username);
+                                int accipted=-1;
+                                for(int i=0;i<offers.size();i++)
+                                {
+                                    System.out.println(offers.get(i).getOfferInfo());
+                                    if(offers.get(i).getStatus()==Status.ACCEPTED)
+                                    {
+                                        accipted=i;
+                                    }
+                                }
+                                if(accipted!=-1)
+                                {
+                                    System.out.println("ride id "+offers.get(accipted).getRequestId()+" started");
+                                    System.out.println("press 1 to end it");
+                                    int ans2 = Integer.parseInt(scan.nextLine());
+                                    while (ans2!=1) {                                        
+                                        ans2 = Integer.parseInt(scan.nextLine());
+                                    }
+                                    SqlDb.getInstance().setRequestStatus(offers.get(accipted).getRequestId(), Status.ENDED);  
+                                    SqlDb.getInstance().removeOffer(offers.get(accipted));
+                                }
+                                
+			}
+			else if (ans == 5){
 				break;
 			}
 			else{
