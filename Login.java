@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Login {
 	Scanner scan;
-	Storage st = SqlTest.getInstance();
+	Storage st = SqlDb.getInstance();
 
 	public User login() {
 		scan = new Scanner(System.in);

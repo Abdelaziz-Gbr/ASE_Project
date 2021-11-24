@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class RateManager {
-	Storage st = SqlTest.getInstance();
+	Storage st = SqlDb.getInstance();
 	private static RateManager ins = null;
 	
 	private RateManager() {
@@ -14,9 +14,15 @@ public class RateManager {
 		return ins;
 	}
 	
-	ArrayList<Integer> checkRates(Client client){
-		return null;
-		
-	}// for the client
+	public String checkRates(Client client){
+		return st.checkRates(client.getUsername());
+	}
 	
+	public void rateDriver(String dusername, float rate) {
+		st.rateDriver(dusername, rate);
+	}
+	
+	public ArrayList<Integer> getRates(Driver driver){
+		return st.getRates(driver.getUsername());
+	}
 }

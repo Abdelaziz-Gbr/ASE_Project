@@ -58,11 +58,8 @@ public class Offer {
 		this.driver = driver;
 	}
 
-	public void acceptOffer() {
-		driver.notify();
 	public String getOfferInfo() {
 		return String.format("%-20s%-15s", String.valueOf(price), status.toString()) + driver.getDriverInfo();
-		
 	}
 	
 }

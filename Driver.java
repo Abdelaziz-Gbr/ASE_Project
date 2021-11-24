@@ -5,9 +5,8 @@ public class Driver extends User{
 	Scanner scan;
 	String licence;
 	String nationalId;
-	ArrayList<String> fav = SqlTest.getInstance().getFav(this.username);
-	ArrayList<Float> rates = new ArrayList<Float>();
-	Scanner scan;
+	ArrayList<String> fav = SqlDb.getInstance().getFav(this.username);
+	ArrayList<Integer> rates;
 	float avreagerate;
 	boolean enabled;
 	
@@ -29,22 +28,33 @@ public class Driver extends User{
 		
 	//}
 
-	public void menu(){
+	public void mainmenu(){
 		System.out.println("Welcome!");
 		while (true){
-
 			scan = new Scanner(System.in);
 			System.out.println("1- list Favorites");
-			System.out.println("2- add Favorites");
-			System.out.println("3- list Rides");
-			System.out.println("4- log out");
+			System.out.println("2- list rates");
+			System.out.println("3- add Favorites");
+			System.out.println("4- list Rides");
+            System.out.println("5- list Offers");
+			System.out.println("6- log out");
 			int ans = Integer.parseInt(scan.nextLine());
-
 			if(ans == 1){
 				for(int i =0 ;i < fav.size() ; i++)
 					System.out.println(fav.get(i));
 			}
-			else if(ans == 2){
+			else if (ans == 2) {
+				rates = RateManager.getInstance().getRates(this);
+				if(rates.isEmpty()) {
+					System.out.println("No Rates");
+				}
+				else {
+					for(int rate : rates) {
+						System.out.println(rate);
+					}
+				}
+			}
+			else if(ans == 3){
 				System.out.println("Enter a new Destination");
 				String input = scan.nextLine();
 				input = input.toLowerCase();
@@ -52,14 +62,38 @@ public class Driver extends User{
 					System.out.println("Already exists");
 				}else {
 					fav.add(input);
-					SqlTest.getInstance().addFav(this.username, input);
+					SqlDb.getInstance().addFav(this.username, input);
 				}
 
 			}
-			else if(ans == 3) {
+			else if(ans == 4) {
 				ListRides();
 			}
-			else if (ans == 4){
+            else if (ans == 5){
+        		ArrayList <Offer>offers=SqlDb.getInstance().checkOffer(username);
+                int accipted=-1;
+                for(int i=0;i<offers.size();i++)
+                {
+                    System.out.println(offers.get(i).getOfferInfo());
+                    if(offers.get(i).getStatus()==Status.ACCEPTED)
+                    {
+                        accipted=i;
+                    }
+                }
+                if(accipted!=-1)
+                {
+                    System.out.println("ride id "+offers.get(accipted).getRequestId()+" started");
+                    System.out.println("press 1 to end it");
+                    int ans2 = Integer.parseInt(scan.nextLine());
+                    while (ans2!=1) {                                        
+                        ans2 = Integer.parseInt(scan.nextLine());
+                    }
+                    SqlDb.getInstance().setRequestStatus(offers.get(accipted).getRequestId(), Status.ENDED);  
+                    SqlDb.getInstance().removeOffer(offers.get(accipted));
+                }
+                                
+			}
+			else if (ans == 6){
 				break;
 			}
 			else{
@@ -141,11 +175,11 @@ public class Driver extends User{
 		this.fav = fav;
 	}
 
-	public ArrayList<Float> getRates() {
+	public ArrayList<Integer> getRates() {
 		return rates;
 	}
 
-	public void setRates(ArrayList<Float> rates) {
+	public void setRates(ArrayList<Integer> rates) {
 		this.rates = rates;
 	}
 	

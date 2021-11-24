@@ -6,7 +6,7 @@ public class Admin extends User {
 		super(username, password, false);
 	}
 
-	public void menu(){
+	public void mainmenu(){
 		System.out.println("Welcome!");
 		Scanner scanner = new Scanner(System.in);
 		while(true){
@@ -18,20 +18,20 @@ public class Admin extends User {
 			System.out.println("6- log out");
 			int ans = Integer.parseInt(scanner.nextLine());
 			if(ans == 1){
-				ArrayList<User> users = SqlTest.getInstance().getUsers();
+				ArrayList<User> users = SqlDb.getInstance().getUsers();
 				for(User user : users)
 					if(!user.getEnabled())
 						System.out.println(user.getUsername());
 			}
 			else if(ans == 2){
-				ArrayList<User> users = SqlTest.getInstance().getUsers();
+				ArrayList<User> users = SqlDb.getInstance().getUsers();
 				for(User user : users)
 					if(user.getEnabled())
 						System.out.println(user.getUsername());
 
 			}
 			else if(ans == 3){
-				ArrayList<Driver> drivers = SqlTest.getInstance().getnotVerifiedDriveres();
+				ArrayList<Driver> drivers = SqlDb.getInstance().getnotVerifiedDriveres();
 				if(drivers.size() < 1) {
 					System.out.println("No Unverified Drivers at the moment");
 				}
@@ -44,12 +44,12 @@ public class Admin extends User {
 			else if(ans == 4){
 				System.out.println("Enter User Name");
 				String userName = scanner.nextLine();
-				SqlTest.getInstance().verify(userName);
+				SqlDb.getInstance().verify(userName);
 			}
 			else if(ans == 5){
 				System.out.println("Enter User name of the user to be suspended");
 				String userName = scanner.nextLine();
-				suspend(SqlTest.getInstance().getUser(userName));
+				suspend(SqlDb.getInstance().getUser(userName));
 			}
 			else if(ans == 6){
 				break;
@@ -64,7 +64,7 @@ public class Admin extends User {
 	public void suspend(User user) {
 		if (!(user instanceof Admin)) {
 			user.setEnabled(false);
-			SqlTest.getInstance().setEnable(user.getUsername(), 0);
+			SqlDb.getInstance().setEnable(user.getUsername(), 0);
 		}else{
 			System.out.println("You can not suspend anther admin!");
 		}
@@ -74,7 +74,7 @@ public class Admin extends User {
 	public void unsuspend(User user){
 		if (!(user instanceof Admin)) {
 			user.setEnabled(true);
-			SqlTest.getInstance().setEnable(user.getUsername(), 1);
+			SqlDb.getInstance().setEnable(user.getUsername(), 1);
 		}else{
 			System.out.println("You can not unsuspended anther admin!");
 		}
@@ -83,6 +83,6 @@ public class Admin extends User {
 	
 	public void accept(Driver driver) {
 			driver.setEnabled(true);
-			SqlTest.getInstance().setEnable(driver.getUsername(), 1);
+			SqlDb.getInstance().setEnable(driver.getUsername(), 1);
 	}
 }

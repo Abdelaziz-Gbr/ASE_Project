@@ -1,13 +1,9 @@
 import java.util.Scanner;
 
 public class User {
-	String username;
-	String password;
+	String username, password, firstname, lastname;
 	Boolean enabled;
-
-	public void menu() {
-
-	}
+	
 	public String getUsername() {
 		return username;
 	}
@@ -25,6 +21,19 @@ public class User {
 	}
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
+	}
+	
+	public String getFirstname() {
+		return firstname;
+	}
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+	public String getLastname() {
+		return lastname;
+	}
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
 	}
 	
 	public User(String username, String password,Boolean enabled) {
