@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Register {
 	Scanner scan;
-	Storage st = SqlTest.getInstance();
+	Storage st = SqlDb.getInstance();
 	public Boolean register() {
 		scan = new Scanner(System.in);
 		User user;
@@ -28,14 +28,15 @@ public class Register {
 
 			user = new Driver(username, password, liences, nationalId);
 			user.setEnabled(false);
-			st.addUser(user);
-			return true;
+			if(st.addUser(user))
+				return true;
 		}
 		else if(choice == 1) {
 			user = new Client(username,password);
-			st.addUser(user);
-			return true;
+			if(st.addUser(user))
+				return true;
 		}
+		System.out.println("username already exists");
 		return false;
 	}
 }

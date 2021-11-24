@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class RequestManager {
 	private static RequestManager ins = null;
-	private Storage st = SqlTest.getInstance();
+	private Storage st = SqlDb.getInstance();
 	private RequestManager() {
 		
 	}
@@ -15,7 +15,7 @@ public class RequestManager {
 	}
 
 	public ArrayList<Request> getRequestsTo(String place){
-		ArrayList<Request> requests = SqlTest.getInstance().getRequestsTo(place);
+		ArrayList<Request> requests = SqlDb.getInstance().getRequestsTo(place);
 		return requests;
 	}
 

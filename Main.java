@@ -5,9 +5,9 @@ public class Main {
 
 	
 	public static void main(String args[]) {
-		//SqlTest.selectAll();
+		//SqlDb.selectAll();
 		
-		//SqlTest.close();
+		//SqlDb.close();
 		/*
 		System.out.println("enter username\n"
 				+ "client1\n"
@@ -36,13 +36,13 @@ public class Main {
 				+ "notifing client1\n");
 				*/
 		/*
-		Storage s = new SqlTest();
+		Storage s = new SqlDb();
 		ArrayList<Offer> o = s.checkOffer("client1");
 		for(Offer offer: o) {
 			System.out.println(offer.price);
 		}*/
 		
-		//SqlTest.selectAll();
+		//SqlDb.selectAll();
 		
 		Register r = new Register();
 		//r.register();*/
@@ -71,7 +71,9 @@ public class Main {
 			System.out.println("1- register.");
 			System.out.println("2- log in.");
 			System.out.println("3- Exit.");
+			
 			int answer = Integer.parseInt(scanner.nextLine());
+			
 			if(answer == 1){
 				Register register = new Register();
 				register.register();
@@ -82,7 +84,7 @@ public class Main {
 				if(user == null){
 					System.out.println("Not found.");
 				}else {
-					user.menu();
+					user.mainmenu();
 				}
 			}else {
 				break;
