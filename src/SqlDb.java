@@ -10,11 +10,17 @@ import java.util.logging.Logger;
 
 public class SqlDb implements Storage {
 
-    public static String url = "jdbc:sqlite:" + System.getProperty("user.dir")+"\\src\\DataBase\\db1.db";
+    public static String url = "jdbc:sqlite:" + System.getProperty("user.dir")+"\\db1.db";
     private static SqlDb ins = null;
 
     private SqlDb() {
         
+    }
+
+    public static void main(String args[]){
+        SqlDb sd = SqlDb.getInstance();
+        User omar = sd.getUser("omar552001");
+        System.out.println(omar.getPassword());
     }
 
     public static SqlDb getInstance() {
@@ -77,13 +83,16 @@ public class SqlDb implements Storage {
                     user = new Client(rs.getString("username"), rs.getString("password"), true);
                 } else if (role.equals("Driver") && rs.getBoolean("enabled")) {
                     Driver driver = new Driver(rs.getString("username"), rs.getString("password"), true);
-                    rs = conn.createStatement().executeQuery(sql2);
-                    driver.setAvreage(rs.getFloat("avgrating"));
-                    driver.setNationalId(rs.getString("national_id"));
-                    driver.setLicence(rs.getString("licence"));
+
+                    ResultSet rs2 = conn.createStatement().executeQuery(sql2);
+                    driver.setAvreage(rs2.getFloat("avgrating"));
+                    driver.setNationalId(rs2.getString("national_id"));
+                    driver.setLicence(rs2.getString("licence"));
                     user = driver;
 
                 }
+                user.setFirstname(rs.getString("firstname"));
+                user.setLastname(rs.getString("lastname"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -91,7 +100,33 @@ public class SqlDb implements Storage {
         return user;
     }
 
-    @Override
+
+    public String getFirstName(String userName){
+        String firstName = "NULL";
+
+        String query = "SELECT firstname FROM User WHERE username = '" + userName + "'";
+        try {
+            ResultSet resultSet = connect().createStatement().executeQuery(query);
+            firstName = resultSet.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return firstName;
+    }
+
+    public String getLastName(String userName){
+        String lastname = "NULL";
+
+        String query = "SELECT lastname FROM User WHERE username = '" + userName + "'";
+        try {
+            ResultSet resultSet = connect().createStatement().executeQuery(query);
+            lastname = resultSet.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastname;
+    }
+
     public Boolean addUser(User user) {
         String sql = "SELECT * FROM User where username == '" + user.getUsername() + "'";
         try (Connection conn = connect()) {
@@ -100,12 +135,14 @@ public class SqlDb implements Storage {
                 return false;
             } 
             else {
-                String insert = "insert into User (username,password,enabled,role) values (?,?,?,?);";
+                String insert = "insert into User (firstname, lastname, username,password,enabled,role) values (?,?,?,?,?,?);";
                 PreparedStatement ins = conn.prepareStatement(insert);
-                ins.setString(1, user.getUsername());
-                ins.setString(2, user.getPassword());
-                ins.setBoolean(3, user.getEnabled());
-                ins.setString(4, user.getClass().getName());
+                ins.setString(1, user.getFirstname());
+                ins.setString(2, user.getLastname());
+                ins.setString(3, user.getUsername());
+                ins.setString(4, user.getPassword());
+                ins.setBoolean(5, user.getEnabled());
+                ins.setString(6, user.getClass().getName());
                 ins.executeUpdate();
                 if(user instanceof Driver)
                 	addDriver((Driver)user);
@@ -230,7 +267,8 @@ public class SqlDb implements Storage {
             conn.createStatement().executeUpdate(sql);
             sql = "delete from Offer where driver= '"+username+"'and status != 'ACCEPTED'";
             conn.createStatement().executeUpdate(sql);
-            sql = "update Request set status = 'STARTED', driver = '"+username+"' where request = " + requestId + ";";            
+            sql = "update Request set status = 'STARTED', driver = '"+username+"' where ID = " + requestId + ";";
+            conn.createStatement().executeUpdate(sql);
             conn.close();
             return true;
         } catch (SQLException e) {
@@ -251,11 +289,11 @@ public class SqlDb implements Storage {
 
     @Override
     public void rateDriver(String username, float rate) {
+        System.out.println("USer name = " + username + " rate = " + rate);
         float avgrate = 0;
         int numrate = 0;
         String sql = "insert into Rates (username,rate) values('" + username + "'," + rate + ") ";
         String sql2 = "select rate from Rates where username == '" + username + "'";
-        String sql3 = "update Driver set avgrating = " + avgrate + "";
         try (Connection conn = connect()) {
             conn.createStatement().executeUpdate(sql);
             ResultSet rs = conn.createStatement().executeQuery(sql2);
@@ -264,6 +302,7 @@ public class SqlDb implements Storage {
                 numrate++;
             }
             avgrate /= numrate;
+            String sql3 = "update Driver set avgrating = " + avgrate + " WHERE username =  '" + username +"'";
             conn.createStatement().executeUpdate(sql3);
         } catch (SQLException e) {
             System.out.println(e.getMessage());

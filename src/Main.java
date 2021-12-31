@@ -68,6 +68,7 @@ public class Main {
 		}*/
 		Scanner scanner = new Scanner(System.in);
 		while (true){
+			boolean registered = false;
 			System.out.println("1- register.");
 			System.out.println("2- log in.");
 			System.out.println("3- Exit.");
@@ -76,7 +77,7 @@ public class Main {
 			
 			if(answer == 1){
 				Register register = new Register();
-				register.register();
+				registered =  register.register();
 			}
 			else if (answer == 2){
 				Login login = new Login();
