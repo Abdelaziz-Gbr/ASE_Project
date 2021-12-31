@@ -6,15 +6,14 @@ public class Register {
 	public Boolean register() {
 		scan = new Scanner(System.in);
 		User user;
+		String firstName;
+		String lastName;
+		System.out.println("Enter your First Name");
+		firstName = scan.nextLine();
+		System.out.println("Enter your Last Name");
+		lastName = scan.nextLine();
 		System.out.println("enter username and password");
 		String username = scan.nextLine();
-		/*String[] newUserName = username.split(" ");
-		if(newUserName.length > 1){
-			System.out.println("No Spaces allowed\n.. deleting the white spaces..");
-			username = "";
-			for(String name : newUserName)
-				username += name;
-		}*/
 		String password = scan.nextLine();
 		System.out.println("Choose the type of your account\n1-Client\n2-Driver");
 
@@ -22,17 +21,17 @@ public class Register {
 
 		if(choice == 2) {
 			System.out.println("Enter your licence");
-			String liences = scan.nextLine();
+			String licences = scan.nextLine();
 			System.out.println("Enter nationalId");
 			String nationalId = scan.nextLine();
 
-			user = new Driver(username, password, liences, nationalId);
+			user = new Driver(firstName , lastName, username ,password, licences, nationalId);
 			user.setEnabled(false);
 			if(st.addUser(user))
 				return true;
 		}
 		else if(choice == 1) {
-			user = new Client(username,password);
+			user = new Client(firstName , lastName, username,password);
 			if(st.addUser(user))
 				return true;
 		}

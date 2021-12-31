@@ -41,6 +41,6 @@ public class RequestManager {
 	public ArrayList<Offer> checkOffers(User user){
 		return st.checkOffer(user.username);
 	}
-	
+
 	
 }

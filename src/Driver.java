@@ -30,6 +30,8 @@ public class Driver extends User{
 
 	public void mainmenu(){
 		System.out.println("Welcome!");
+		System.out.print(SqlDb.getInstance().getFirstName(this.username));
+		System.out.println(" " + SqlDb.getInstance().getLastName(this.username));
 		while (true){
 			scan = new Scanner(System.in);
 			System.out.println("1- list Favorites");
@@ -78,6 +80,7 @@ public class Driver extends User{
                     if(offers.get(i).getStatus()==Status.ACCEPTED)
                     {
                         accipted=i;
+						break;
                     }
                 }
                 if(accipted!=-1)
@@ -185,5 +188,11 @@ public class Driver extends User{
 	
 	public String getDriverInfo(){
 		return String.format("%-20s%-20s%-20s", firstname , username, avreagerate);
+	}
+
+	public Driver(String firstName, String lastName, String username, String password,String licence,String nationalId) {
+		super(firstName, lastName, username, password, false);
+		this.licence = licence;
+		this.nationalId = nationalId;
 	}
 }

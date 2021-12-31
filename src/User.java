@@ -37,7 +37,14 @@ public class User {
 	}
 	
 	public User(String username, String password,Boolean enabled) {
-		super();
+		this.username = username;
+		this.password = password;
+		this.enabled = enabled;
+	}
+
+	public User(String firstname, String lastname, String username, String password,Boolean enabled) {
+		this.firstname = firstname;
+		this.lastname = lastname;
 		this.username = username;
 		this.password = password;
 		this.enabled = enabled;

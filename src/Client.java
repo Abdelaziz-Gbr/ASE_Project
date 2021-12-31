@@ -6,6 +6,13 @@ public class Client extends User {
 	public Client(String username, String password) {
 		super(username, password, true);
 	}
+
+	public Client(String firstName, String lastName, String username, String password) {
+		super(firstName , lastName, username, password, true);
+	}
+	public Client(String firstName, String lastName, String username, String password , boolean enabled) {
+		super(firstName , lastName, username, password, enabled);
+	}
 	
 	public Client(String username, String password, Boolean enabled) {
 		super(username, password, enabled);
@@ -22,11 +29,14 @@ public class Client extends User {
 	
 	@Override
 	public void mainmenu() {
+		System.out.println("Welcome!");
+		System.out.print(SqlDb.getInstance().getFirstName(this.username));
+		System.out.println(" " + SqlDb.getInstance().getLastName(this.username));
 		Scanner scan = new Scanner(System.in);
 		String choice;
 		while(true) {
 			String hasRate = RateManager.getInstance().checkRates(this);
-			if(hasRate != null && hasRate != "None") {
+			if(hasRate != null && !hasRate.equalsIgnoreCase("None")) {
 				System.out.println("Do You want to rate the last Ride?(y/n) ");
 				if(scan.nextLine().contains("y")) {
 					System.out.println("Enter rate from 1 to 5");
