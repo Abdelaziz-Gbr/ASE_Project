@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 
 public class Client extends User {
@@ -10,10 +11,13 @@ public class Client extends User {
 	public Client(String firstName, String lastName, String username, String password) {
 		super(firstName , lastName, username, password, true);
 	}
+
 	public Client(String firstName, String lastName, String username, String password , boolean enabled) {
 		super(firstName , lastName, username, password, enabled);
 	}
-	
+	private double calculateDiscount() {
+		return 0.0;
+	}
 	public Client(String username, String password, Boolean enabled) {
 		super(username, password, enabled);
 	}
@@ -25,6 +29,10 @@ public class Client extends User {
 		System.out.println("Enter Destination");
 		String destination = scan.nextLine().trim();
 		RequestManager.getInstance().makeRequest(new Request(source, destination, this));
+	}
+
+	private void CalculateFareAfterDiscounts(){
+
 	}
 	
 	@Override
@@ -48,10 +56,15 @@ public class Client extends User {
 			choice = scan.nextLine();
 			if(choice.contains("1")) {
 				System.out.println("Enter Source and Destination");
-				Request request = new Request(scan.nextLine(),scan.nextLine(),this);
+				String src = scan.nextLine();
+				String dis = scan.nextLine();
+				System.out.println("Enter number of Passengers");
+				int num = Integer.parseInt(scan.nextLine());
+				Request request = new Request(src,dis,this, num);
 				RequestManager.getInstance().makeRequest(request);
 			}
 			else if(choice.contains("2")) {
+				SqlDb.getInstance().CalculateClientPrice(this.username);
 				ArrayList<Offer> offers = RequestManager.getInstance().checkOffers(this);
 				if(offers.size() == 0) {
 					System.out.println("There is no Offers Right Now");

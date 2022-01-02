@@ -4,7 +4,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -144,6 +149,9 @@ public class SqlDb implements Storage {
                 ins.setBoolean(5, user.getEnabled());
                 ins.setString(6, user.getClass().getName());
                 ins.executeUpdate();
+                if(user instanceof  Client){
+                    addClient((Client) user);
+                }
                 if(user instanceof Driver)
                 	addDriver((Driver)user);
             }
@@ -177,18 +185,13 @@ public class SqlDb implements Storage {
 
     @Override
     public boolean addClient(Client client) {
-        String sql = "SELECT * FROM Client where username == '" + client.getUsername() + "'";
+
+        String sql = "insert into Client (username)  \r\n"
+                + "values ('" + client.getUsername() + "');";
+
 
         try (Connection conn = connect()) {
-            ResultSet rs = conn.createStatement().executeQuery(sql);
-
-            if (rs.next()) {
-                return false;
-            } else {
-                String insert = "insert into Client (username)  \r\n"
-                        + "values ('" + client.getUsername() + "');";
-                conn.createStatement().executeUpdate(insert);
-            }
+            conn.createStatement().executeUpdate(sql);
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -209,6 +212,108 @@ public class SqlDb implements Storage {
         return null;
     }
 
+    public LocalDate getClientDate(String userName){
+        String query = "SELECT BirthDate FROM Client WHERE username = '" + userName + "'";
+        LocalDate date = LocalDate.now();
+        try (Connection conn = connect()){
+            ResultSet rs = conn.createStatement().executeQuery(query);
+            date =LocalDate.parse(rs.getString("BirthDate"));
+
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    public ArrayList<String> getDiscountAreas(){
+        ArrayList<String> areas = new ArrayList<String>();
+        String query = "SELECT Name FROM onDiscountAreas";
+        try (Connection conn = connect()){
+            ResultSet rs = conn.createStatement().executeQuery(query);
+            while(rs.next()){
+                areas.add(rs.getString("Name"));
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return areas;
+    }
+
+    public boolean FirstRide(String userName){
+        boolean firstRide = false;
+
+        String query = "SELECT FirstRide FROM Client WHERE username = '" + userName + "'";
+        try(Connection conn = connect()){
+            ResultSet rs = conn.createStatement().executeQuery(query);
+            firstRide = rs.getBoolean("FirstRide");
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return firstRide;
+    }
+
+    public void updatePrice(String driver, int req, double price){
+        String query = "UPDATE Offer SET ClientPrice = '"+ price + "' WHERE driver = '" + driver + "' AND request = '"+ req + "'";
+
+        try(Connection conn = connect()){
+            conn.createStatement().executeUpdate(query);
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void CalculateClientPrice(String username) {
+        String sql = "SELECT distinct Offer.Price AS Price, Request.destination As Destination, Request.Date AS Date, Request.Passengeres As Passengers, Offer.Driver As Driver, Request.ID AS ID\r\n"
+                + "  FROM Request,Offer \r\n"
+                + "  where Request.client = '" + username + "' AND Request.ID = Offer.request";
+
+        try (Connection conn = connect()) {
+
+            ResultSet rs = conn.createStatement().executeQuery(sql);
+            while (rs.next()) {
+                double Price = rs.getFloat("Price");
+                String date= rs.getString("Date");
+                String destination = rs.getString("Destination");
+                int passengers = rs.getInt("Passengers");
+                if(DiscountCalculater.birthDate(LocalDate.parse(date), getClientDate(username))){
+                    System.out.println("Happy birthDay!");
+                    Price -= 0.1*Price;
+                }
+
+                if(DiscountCalculater.PublicHoliday(LocalDate.parse(date))){
+                    System.out.println("Happy 18th of June!!");
+                    Price -= 0.05*Price;
+                }
+
+                if(DiscountCalculater.TwoPassenger(passengers)){
+                    System.out.println("Have a Nice Companion!");
+                    Price -= 0.05*Price;
+                }
+
+
+                if(DiscountCalculater.onDiscount(destination)){
+                    System.out.println("Have a Nice Ride!");
+                    Price -= 0.1*Price;
+                }
+
+                if(DiscountCalculater.FirstRide(username)){
+                    System.out.println("Hope you enjoy it!");
+                    Price -= 0.1*Price;
+                }
+
+                updatePrice(rs.getString("Driver"), rs.getInt("ID"), Price);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
     @Override
     public ArrayList<Offer> checkOffer(String username) {
         String sql = "SELECT distinct Offer.*\r\n"
@@ -219,7 +324,7 @@ public class SqlDb implements Storage {
 
             ResultSet rs = conn.createStatement().executeQuery(sql);
             while (rs.next()) {
-                Offer off = new Offer(rs.getFloat("price"), null);
+                Offer off = new Offer(rs.getFloat("ClientPrice"), null);
                 off.setStatus(Status.valueOf(rs.getString("status")));
                 off.setRequestId(rs.getInt("request"));
                 off.setDriver((Driver) getUser(rs.getString("driver")));
@@ -231,9 +336,19 @@ public class SqlDb implements Storage {
         return out;
     }
 
+    public void setBirthDay(String username, java.sql.Date date){
+        String query = "UPDATE Client SET BirthDate = '"+ date + "' WHERE username = '"+ username + "'";
+        try (Connection conn = connect()){
+            conn.createStatement().executeUpdate(query);
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void addRequest(Request request) {
-        String sql = "Insert into request (client,source,destination) values('" + request.getClient().getUsername() + "','" + request.getSource() + "','" + request.getDestnation() + "')";
+        String sql = "Insert into request (client,source,destination, Date, Passengeres) values('" + request.getClient().getUsername() + "','" + request.getSource() + "','" + request.getDestnation() + "', '" + java.time.LocalDate.now() +"','"+request.num+"')";
 
         try (Connection conn = connect()) {
             conn.createStatement().executeUpdate(sql);
@@ -259,10 +374,34 @@ public class SqlDb implements Storage {
 
     }
 
+    public void checkFirstTime(int requestID){
+        String userName = getClientFromReqID(requestID);
+        String query = "UPDATE Client SET FirstRide = 0 WHERE username = '"+ userName + "' ";
+
+        try(Connection conn = connect()) {
+            conn.createStatement().executeUpdate(query);
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public String getClientFromReqID(int requestID){
+        String query = "SELECT DISTINCT client FROM Request WHERE ID = '"+ requestID +"'";
+        String username = "";
+        try(Connection conn = connect()) {
+            ResultSet rs = conn.createStatement().executeQuery(query);
+            username = rs.getString("client");
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return username;
+    }
     @Override
     public boolean acceptOffer(String username, int requestId) {
-        String sql = "update Offer set status = 'ACCEPTED' where driver = '" + username + "' and request = " + requestId + ";";
 
+        String sql = "update Offer set status = 'ACCEPTED' where driver = '" + username + "' and request = " + requestId + ";";
         try (Connection conn = connect()){
             conn.createStatement().executeUpdate(sql);
             sql = "delete from Offer where driver= '"+username+"'and status != 'ACCEPTED'";
@@ -270,6 +409,7 @@ public class SqlDb implements Storage {
             sql = "update Request set status = 'STARTED', driver = '"+username+"' where ID = " + requestId + ";";
             conn.createStatement().executeUpdate(sql);
             conn.close();
+            checkFirstTime(requestId);
             return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -475,4 +615,24 @@ public class SqlDb implements Storage {
 		return rates;
 	
 	}
+
+    public void addOnDiscountAreas(String Area){
+        String sql = "INSERT INTO onDiscountAreas (name) values ('" +Area+"')";
+        try(Connection conn = connect()){
+            conn.createStatement().executeUpdate(sql);
+        }
+        catch (SQLException e){
+            System.err.println(e);
+        }
+    }
+    public void DeleteFromDiscountAreas(String Area){
+        String sql = "DELETE FROM onDiscountAreas WHERE name = '" +Area+"'";
+        try(Connection conn = connect()){
+            conn.createStatement().executeUpdate(sql);
+        }
+        catch (SQLException e){
+            System.err.println(e);
+        }
+    }
+
 }

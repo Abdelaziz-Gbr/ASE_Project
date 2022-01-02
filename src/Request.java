@@ -1,3 +1,4 @@
+import java.util.Scanner;
 
 public class Request {
 	
@@ -8,12 +9,21 @@ public class Request {
 	Client client;
 	Status status;
 	int requestID;
+	int num;
 	public Request(String source, String destnation, Client client) {
 		super();
 		this.source = source;
 		this.destnation = destnation;
 		this.client = client;
 		status = Status.PENDING;
+	}
+	public Request(String source, String destnation, Client client, int passengers) {
+		super();
+		this.source = source;
+		this.destnation = destnation;
+		this.client = client;
+		status = Status.PENDING;
+		num = passengers;
 	}
 
 	public int getRequestID() {

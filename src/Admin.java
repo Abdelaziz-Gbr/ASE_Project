@@ -6,16 +6,18 @@ public class Admin extends User {
 		super(username, password, false);
 	}
 
+	Scanner scanner = new Scanner(System.in);
 	public void mainmenu(){
 		System.out.println("Welcome!");
-		Scanner scanner = new Scanner(System.in);
 		while(true){
 			System.out.println("1- list suspended users");
 			System.out.println("2- list unsuspended users");
 			System.out.println("3- list un-verified drivers");
 			System.out.println("4- Verify a driver");
 			System.out.println("5- Suspend a user");
-			System.out.println("6- log out");
+			System.out.println("6- Add Area on Discount");
+			System.out.println("7- Delete Area on Discount");
+			System.out.println("8- log out");
 			int ans = Integer.parseInt(scanner.nextLine());
 			if(ans == 1){
 				ArrayList<User> users = SqlDb.getInstance().getUsers();
@@ -52,6 +54,12 @@ public class Admin extends User {
 				suspend(SqlDb.getInstance().getUser(userName));
 			}
 			else if(ans == 6){
+				addAreasOnDiscount();
+			}
+			else if(ans == 7){
+				DeleteAreasOnDiscount();
+			}
+			else if(ans == 8){
 				break;
 			}
 			else{
@@ -84,5 +92,17 @@ public class Admin extends User {
 	public void accept(Driver driver) {
 			driver.setEnabled(true);
 			SqlDb.getInstance().setEnable(driver.getUsername(), 1);
+	}
+
+	private void addAreasOnDiscount(){
+		System.out.println("Enter Area:");
+		String area = scanner.nextLine();
+		SqlDb.getInstance().addOnDiscountAreas(area);
+	}
+
+	private void DeleteAreasOnDiscount(){
+		System.out.println("Enter Area:");
+		String area = scanner.nextLine();
+		SqlDb.getInstance().DeleteFromDiscountAreas(area);
 	}
 }
